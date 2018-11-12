@@ -18,6 +18,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
+import java.lang.management.ManagementFactory;
 import java.math.BigInteger;
 import java.net.Socket;
 import java.security.InvalidKeyException;
@@ -47,6 +48,10 @@ import javax.crypto.Mac;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
+import javax.management.Attribute;
+import javax.management.AttributeList;
+import javax.management.MBeanServer;
+import javax.management.ObjectName;
 import javax.security.auth.x500.X500Principal;
 import javax.xml.bind.DatatypeConverter;
 
@@ -58,6 +63,7 @@ public class ClienteConSeguridad extends Thread
 	public static int fallas = 0;
 	public double tiempo1 = 0;
 	public double tiempo2 = 0;
+	private double carga;
 	Socket s;
 	PrintWriter pw;
 	BufferedReader br;
@@ -296,6 +302,12 @@ public class ClienteConSeguridad extends Thread
 			return;
 		}
 		tiempo2 = System.currentTimeMillis() - inicio;
+		try {
+			carga = getSystemCpuLoad();
+		} catch (Exception e) {
+			fallas++;
+			return;
+		}
 		print();
 
 	}
@@ -357,14 +369,26 @@ public class ClienteConSeguridad extends Thread
 	{
 		Writer output;
 		try {
-			output = new BufferedWriter(new FileWriter("./Resultados/CSeguridad/8PT-80T-100ms.txt", true));  
-			output.append("\n" + tiempo1 + " "+tiempo2);
+			output = new BufferedWriter(new FileWriter("./Resultados/CSeguridad/8PT-400T-20ms.txt", true));  
+			output.append("\n" + tiempo1 + " "+tiempo2 + " " +carga);
 			output.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			fallas++;
 			return;
 		}
 	}
+	public double getSystemCpuLoad() throws Exception{
+		MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+		ObjectName name = ObjectName.getInstance("java.lang:type=OperatingSystem");
+		AttributeList list = mbs.getAttributes(name, new String[]{ "SystemCpuLoad" });
+		if (list.isEmpty()) return Double.NaN;
+		Attribute att = (Attribute)list.get(0);
+		Double value = (Double)att.getValue();
+		// usually takes a couple of seconds before we get real values
+		if (value == -1.0) return Double.NaN;
+		// returns a percentage value with 1 decimal point precision
+		return ((int)(value * 1000) / 10.0);
+	}
+
 }
 

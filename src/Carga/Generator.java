@@ -41,8 +41,8 @@ public class Generator
 	public Generator ()
 	{
 		Task work = createTask();
-		int numberOfTasks = 80;
-		int gapBetweenTasks = 100;
+		int numberOfTasks = 400;
+		int gapBetweenTasks = 20;
 		generator = new LoadGenerator("Client - Server Load Test", numberOfTasks, work, gapBetweenTasks);
 		generator.generate();
 		try {
@@ -63,9 +63,8 @@ public class Generator
 	public void print() throws Exception
 	{
 		Writer output;
-		output = new BufferedWriter(new FileWriter("./Resultados/CSeguridad/8PT-80T-100ms.txt", true));  
+		output = new BufferedWriter(new FileWriter("./Resultados/CSeguridad/8PT-400T-20ms.txt", true));  
 		output.append("\nNumero de Fallas:" + ClienteConSeguridad.fallas);
-		output.append("\nCarga del CPU:" + getSystemCpuLoad());
 		output.close();
 	}
 	/**
@@ -77,18 +76,5 @@ public class Generator
 		@SuppressWarnings("unused")
 		Generator gen = new Generator();
 	}
-	public double getSystemCpuLoad() throws Exception {
-		MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
-		ObjectName name = ObjectName.getInstance("java.lang:type=OperatingSystem");
-		AttributeList list = mbs.getAttributes(name, new String[]{ "SystemCpuLoad" });
-		if (list.isEmpty()) return Double.NaN;
-		Attribute att = (Attribute)list.get(0);
-		Double value = (Double)att.getValue();
-		// usually takes a couple of seconds before we get real values
-		if (value == -1.0) return Double.NaN;
-		// returns a percentage value with 1 decimal point precision
-		return ((int)(value * 1000) / 10.0);
-	}
-
 }
 
