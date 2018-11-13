@@ -34,7 +34,7 @@ public class Coordinador {
 	{
 		//Crea el pool
 
-		int numT = 2;
+		int numT = 1;
 
 		ExecutorService exec = Executors.newFixedThreadPool(numT);
 

@@ -63,7 +63,7 @@ public class Generator
 	public void print() throws Exception
 	{
 		Writer output;
-		output = new BufferedWriter(new FileWriter("./Resultados/CSeguridad/8PT-400T-20ms.txt", true));  
+		output = new BufferedWriter(new FileWriter("./Resultados/SSeguridad/1PT-400T-20ms.txt", true));  
 		output.append("\nNumero de Fallas:" + ClienteConSeguridad.fallas);
 		output.close();
 	}

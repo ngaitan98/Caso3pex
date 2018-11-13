@@ -10,6 +10,7 @@ import java.io.Writer;
 import java.net.Socket;
 
 import Cliente.ClienteConSeguridad;
+import Cliente.ClienteSinSeguridad;
 import uniandes.gload.core.Task;
 
 /**
@@ -26,7 +27,7 @@ import uniandes.gload.core.Task;
  */
 public class ClienteTask extends Task
 {
-	ClienteConSeguridad c;
+	ClienteSinSeguridad c;
 	@Override
 	public void execute() 
 	{
@@ -35,7 +36,7 @@ public class ClienteTask extends Task
 			s = new Socket("localhost", 8080);
 			PrintWriter pw = new PrintWriter( s.getOutputStream( ), true );
 			BufferedReader br = new BufferedReader( new InputStreamReader( s.getInputStream( ) ) );
-			c = new ClienteConSeguridad(s, pw, br);
+			c = new ClienteSinSeguridad(s, pw, br);
 			c.start();
 		} catch (IOException e) {
 		}

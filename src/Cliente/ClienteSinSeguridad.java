@@ -4,10 +4,14 @@ import java.io.BufferedInputStream;
 
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.FileInputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.io.Writer;
+import java.lang.management.ManagementFactory;
 import java.net.Socket;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -18,8 +22,18 @@ import java.security.PublicKey;
 import java.security.Signature;
 import java.util.Scanner;
 
+import javax.management.Attribute;
+import javax.management.AttributeList;
+import javax.management.MBeanServer;
+import javax.management.ObjectName;
+
 public class ClienteSinSeguridad extends Thread
 {
+	public static int fallas = 0;
+	public double tiempo1 = 0;
+	public double tiempo2 = 0;
+	private double carga;
+	
 	Socket s;
 	PrintWriter pw;
 	BufferedReader br;
@@ -32,116 +46,120 @@ public class ClienteSinSeguridad extends Thread
 	public void run()
 	{
 		pw.println("HOLA");
-		System.out.println("Cliente HOLA");
 		try {
 			String answer = br.readLine();
-			System.out.println("Servidor " + answer);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			System.out.println("ERROR en 1");
+			fallas++;
 			return;
 		}
-		Scanner sc = new Scanner(System.in);
-		System.out.println("Ingrese el algoritmo Simetrico:");
-		String alg = sc.nextLine() + ":";
-		System.out.println("Ingrese el algoritmo de Asimetrico:");
-		alg +=  sc.nextLine() + ":";
-		System.out.println("Ingrese el algoritmo de cifrado por HMAC:");
-		alg += sc.nextLine();
-		System.out.println("ALGORITMOS:"+alg);
-		pw.println("ALGORITMOS:"+alg);
+		pw.println("ALGORITMOS:"+"AES:RSA:HMACMD5");
 		try {
 			String answer = br.readLine();
-			System.out.println("Servidor " + answer);
 			if(answer.equals("ERROR"))
 			{
+				fallas++;
 				return;
 			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			System.out.println("ERROR en 2");
+			fallas++;
 			return;
 		}
 		pw.println("Certificado del Cliente");
 		try {
 			String answer = br.readLine();
-			System.out.println("Servidor " + answer);
 			if(answer.equals("ERROR"))
 			{
+				fallas++;
 				return;
 			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			System.out.println("ERROR en 3");
 			return;
 		}
 		try {
 			String answer = br.readLine();
-			System.out.println("Servidor " + answer);
-			if(answer.equals("ERROR"))
-			{
-				return;
-			}
+			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			System.out.println("ERROR en 4");
+			fallas++;
 			return;
 		}
 		pw.println("OK");
+		double inicio = System.currentTimeMillis();
 		try {
 			String answer = br.readLine();
-			System.out.println("Servidor " + answer);
 			if(answer.equals("ERROR"))
 			{
+				fallas++;
 				return;
 			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			System.out.println("ERROR en 4");
 			return;
 		}
 		pw.println("LS");
 		try {
 			String answer = br.readLine();
-			System.out.println("Servidor " + answer);
 			if(answer.equals("ERROR"))
 			{
+				fallas++;
 				return;
 			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			System.out.println("ERROR en 4");
+			fallas++;
 			return;
 		}
-		System.out.println("Ingrese la consulta:");
-		String num1 = sc.nextLine();
-		pw.println(num1);
-		pw.println(num1);
+		tiempo1 = System.currentTimeMillis() - inicio;
+		pw.println(3);
+		pw.println(3);
 		try {
+			inicio = System.currentTimeMillis();
 			String answer = br.readLine();
-			System.out.println("Servidor " + answer);
 			if(answer.equals("ERROR"))
 			{
+				fallas++;
 				return;
 			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			System.out.println("ERROR en 4");
+			fallas++;
+			return;
+		}
+		tiempo2 = System.currentTimeMillis() - inicio;
+		try {
+			carga = getSystemCpuLoad();
+		} catch (Exception e) {
+			fallas++;
+			return;
+		}
+		print();
+	}
+	public void print()
+	{
+		Writer output;
+		try {
+			output = new BufferedWriter(new FileWriter("./Resultados/SSeguridad/1PT-400T-20ms.txt", true));  
+			output.append("\n" + tiempo1 + " "+tiempo2 + " " +carga);
+			output.close();
+		} catch (IOException e) {
+			fallas++;
 			return;
 		}
 	}
-	public final static void main(String[] args)
-	{
-		try {
-			Socket s = new Socket("localhost", 8080);
-			PrintWriter pw = new PrintWriter( s.getOutputStream( ), true );
-            BufferedReader br = new BufferedReader( new InputStreamReader( s.getInputStream( ) ) );
-            ClienteSinSeguridad c = new ClienteSinSeguridad(s, pw, br);
-            c.start();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			return;
-		}
+	public double getSystemCpuLoad() throws Exception{
+		MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+		ObjectName name = ObjectName.getInstance("java.lang:type=OperatingSystem");
+		AttributeList list = mbs.getAttributes(name, new String[]{ "SystemCpuLoad" });
+		if (list.isEmpty()) return Double.NaN;
+		Attribute att = (Attribute)list.get(0);
+		Double value = (Double)att.getValue();
+		// usually takes a couple of seconds before we get real values
+		if (value == -1.0) return Double.NaN;
+		// returns a percentage value with 1 decimal point precision
+		return ((int)(value * 1000) / 10.0);
 	}
 }
 
