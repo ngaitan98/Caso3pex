@@ -12,6 +12,7 @@ import javax.management.MBeanServer;
 import javax.management.ObjectName;
 
 import Cliente.ClienteConSeguridad;
+import Cliente.ClienteSinSeguridad;
 import uniandes.gload.core.LoadGenerator;
 import uniandes.gload.core.Task;
 
@@ -41,8 +42,8 @@ public class Generator
 	public Generator ()
 	{
 		Task work = createTask();
-		int numberOfTasks = 400;
-		int gapBetweenTasks = 20;
+		int numberOfTasks = 80;
+		int gapBetweenTasks = 100;
 		generator = new LoadGenerator("Client - Server Load Test", numberOfTasks, work, gapBetweenTasks);
 		generator.generate();
 		try {
@@ -60,13 +61,15 @@ public class Generator
 	{
 		return new ClienteTask();
 	}
+	
 	public void print() throws Exception
 	{
 		Writer output;
-		output = new BufferedWriter(new FileWriter("./Resultados/SSeguridad/1PT-400T-20ms.txt", true));  
-		output.append("\nNumero de Fallas:" + ClienteConSeguridad.fallas);
+		output = new BufferedWriter(new FileWriter("./Resultados/SSeguridad/8PT-80T-100ms.txt", true));  
+		output.append("\nNumero de Fallas:" + ClienteSinSeguridad.fallas);
 		output.close();
 	}
+	
 	/**
 	 * Starts the Application
 	 * @param args

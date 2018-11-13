@@ -141,7 +141,7 @@ public class ClienteSinSeguridad extends Thread
 	{
 		Writer output;
 		try {
-			output = new BufferedWriter(new FileWriter("./Resultados/SSeguridad/1PT-400T-20ms.txt", true));  
+			output = new BufferedWriter(new FileWriter("./Resultados/SSeguridad/8PT-80T-100ms.txt", true));  
 			output.append("\n" + tiempo1 + " "+tiempo2 + " " +carga);
 			output.close();
 		} catch (IOException e) {
